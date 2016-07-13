@@ -1,0 +1,1 @@
+worker: bundle exec ruby daily_tasks.rb 
