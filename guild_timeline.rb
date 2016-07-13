@@ -6,9 +6,6 @@ require 'pg'
 module TOS
 	class GuildTimeline
 		def initialize()
-			@DB = Sequel.connect(ENV['DATABASE']) 
-			@top_daily_retweeted = @DB[:top_daily_retweeted] # Create a dataset
-
 			# @ArpiJakab
 			@client = Twitter::REST::Client.new do |config|
 			  config.consumer_key        = ENV['TWITTER_AJ_CONSUMER_KEY']
@@ -21,29 +18,36 @@ module TOS
 		end
 		
 		def update
-			request = Twitter::REST::Request.new(@client, "get", "1.1/collections/entries.json", 
-				{"id" => @collection_id, "count" => 200}) 
-			entries = request.perform()
-			collection = Set.new()
-			entries[:objects][:tweets].each do |tweet|
-			#entries['objects']['tweets'].each do |tweet|
-				#puts tweet[0]
-				collection.add(tweet[0].to_s)
-			end
+			@DB = Sequel.connect(ENV['DATABASE']) 
+			@top_daily_retweeted = @DB[:top_daily_retweeted] # Create a dataset
 
-			@top_daily_retweeted.all.each do |retweeted|
-				#puts collection.include? retweeted[:id]
-				if (collection.include? retweeted[:id]) == false
-					# must be retweeted more than once by another guild member within 24 hours
-					if (retweeted[:retweet_count] > 1)
-						# TODO: sort by create_at 
-						puts "adding #{retweeted[:id]}"
-						request = Twitter::REST::Request.new(@client, "post", "1.1/collections/entries/add.json", 
-							{"id" => @collection_id, "tweet_id" => retweeted[:id]}) 
-						result = request.perform()
-						puts result
+			begin
+				request = Twitter::REST::Request.new(@client, "get", "1.1/collections/entries.json", 
+					{"id" => @collection_id, "count" => 200}) 
+				entries = request.perform()
+				collection = Set.new()
+				entries[:objects][:tweets].each do |tweet|
+				#entries['objects']['tweets'].each do |tweet|
+					#puts tweet[0]
+					collection.add(tweet[0].to_s)
+				end
+
+				@top_daily_retweeted.all.each do |retweeted|
+					#puts collection.include? retweeted[:id]
+					if (collection.include? retweeted[:id]) == false
+						# must be retweeted more than once by another guild member within 24 hours
+						if (retweeted[:retweet_count] > 1)
+							# TODO: sort by create_at 
+							puts "adding #{retweeted[:id]}"
+							request = Twitter::REST::Request.new(@client, "post", "1.1/collections/entries/add.json", 
+								{"id" => @collection_id, "tweet_id" => retweeted[:id]}) 
+							result = request.perform()
+							puts result
+						end
 					end
 				end
+			ensure
+				@DB.close()
 			end
 		end
 	end

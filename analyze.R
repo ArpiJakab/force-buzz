@@ -249,4 +249,6 @@ db_write_retweeted()
 get_top_retweets()
 #warnings()
 
+dbDisconnect(con)
+
 print("Finished analyzing twitter stream")
