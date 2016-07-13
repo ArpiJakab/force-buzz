@@ -47,7 +47,7 @@ module TOS
 					end
 				end
 			ensure
-				@DB.close()
+				@DB.disconnect()
 			end
 		end
 	end

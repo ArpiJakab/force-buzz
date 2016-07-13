@@ -37,7 +37,7 @@ module TOS
 			rescue EvenMachine::ConnectionError => e
 				puts "Twitter stream API error " + e
 			ensure
-				@DB.close()
+				@DB.disconnect()
 				client.stop		
 			end			
 		end
