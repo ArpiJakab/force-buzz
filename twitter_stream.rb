@@ -30,6 +30,7 @@ module TOS
 			# Use 'userstream' to get message from your stream
 			client = TweetStream::Client.new
 
+			# listen to Twitter stream API
 			begin
 				client.userstream do |status|
 					puts "status id = #{status.id}"#, #{status.attrs}"
