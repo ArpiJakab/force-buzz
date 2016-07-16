@@ -21,16 +21,20 @@ require_relative 'tos'
 
 module TOS
 	@@twitter_stream_is_recording = false
-
+	@@last_run_db_cleanup = 0
+	@@db_cleanup_schedule = 60*60*24 # daily
+	@@last_run_update_timeline = 0
+	@@update_timeline_schedule = 60*10 # every 10 minutes
+	
 	def self.start_tasks
 		while (true)
 			if @@twitter_stream_is_recording == false
 				Thread.new { start_record_twitter_stream() }
 			end
 			
-			# run every 10 minutes
+			db_cleanup()
 			update_salesforce_guild_timeline()			
-			sleep(60 * 10) 
+			sleep(60) 
 		end
 	end
 	
@@ -48,8 +52,32 @@ module TOS
 		@@twitter_stream_is_recording = false
 		puts 'Stop: Record twitter stream task, ' + Time.now.inspect
 	end
+
+	def self.db_cleanup
+		if @@last_run_db_cleanup == 0 || Time.now - @@last_run_db_cleanup >= @@db_cleanup_schedule
+			@@last_run_db_cleanup = Time.now
+		else
+			return
+		end
+		
+		puts 'Start: DB cleanup task, ' + Time.now.inspect
+		begin
+			ts = TwitterStream.new()
+			ts.delete_day_old_tweets()
+		rescue Exception => e
+			puts "DB cleanup failed with error: #{e} #{Time.now.inspect}"
+			raise e
+		end
+		puts 'Stop: DB cleanup task, ' + Time.now.inspect
+	end
 	
 	def self.update_salesforce_guild_timeline
+		if @@last_run_update_timeline == 0 || Time.now - @@last_run_update_timeline >= @@update_timeline_schedule
+			@@last_run_update_timeline = Time.now
+		else
+			return
+		end
+
 		puts 'Start: Update salesforce guild timeline task, ' + Time.now.inspect
 		begin
 			timeline = GuildTimeline.new()
@@ -59,16 +87,7 @@ module TOS
 			raise e
 		end
 		puts 'Stop: Update salesforce guild timeline task, ' + Time.now.inspect
-	end
-	
-	#puts "Hello Heroku World One"
-
-	# require 'sinatra'
-	# 
-	# get '/' do
-	#   "Hello, heroku world"
-	# end
-	
+	end	
 end
 
 TOS.start_tasks();

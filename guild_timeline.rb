@@ -18,7 +18,7 @@ module TOS
 		end
 		
 		def update
-			@DB = Sequel.connect(ENV['DATABASE']) 
+			@DB = Sequel.connect(ENV['DATABASE_URL']) 
 			@top_daily_retweeted = @DB[:top_daily_retweeted] # Create a dataset
 
 			begin
