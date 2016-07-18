@@ -55,12 +55,12 @@ module TOS
 
 	def self.db_cleanup
 		if @@last_run_db_cleanup == 0 || Time.now - @@last_run_db_cleanup >= @@db_cleanup_schedule
+			puts "Start: DB cleanup task #{Time.now.inspect}, last run #{@@last_run_db_cleanup}"
 			@@last_run_db_cleanup = Time.now
 		else
 			return
 		end
 		
-		puts 'Start: DB cleanup task, ' + Time.now.inspect
 		begin
 			ts = TwitterStream.new()
 			ts.delete_day_old_tweets()
@@ -73,12 +73,12 @@ module TOS
 	
 	def self.update_salesforce_guild_timeline
 		if @@last_run_update_timeline == 0 || Time.now - @@last_run_update_timeline >= @@update_timeline_schedule
+			puts "Start: Update salesforce guild timeline task #{Time.now.inspect}, last run #{@@last_run_update_timeline}"
 			@@last_run_update_timeline = Time.now
 		else
 			return
 		end
 
-		puts 'Start: Update salesforce guild timeline task, ' + Time.now.inspect
 		begin
 			timeline = GuildTimeline.new()
 			timeline.update()
