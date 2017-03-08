@@ -1,4 +1,6 @@
-Want to know what's top of mind for customers that you follow on twitter? If you follow hundreds or thousands of people, the amount of tweets can be overwhelming to monitor. I wrote a bot that monitors the continuous activity of all the people I follow and publishes the 'top hits' on a custom Twitter feed. See here goo.gl/Wte1I2. 
+Want to know what's top of mind for customers that you follow on twitter? 
+
+If you follow hundreds or thousands of people on Twitter, the amount of tweets can quickly overwhelm you. I wrote a bot that monitors the continuous activity of all the people I follow and publishes the 'top hits' on a custom Twitter feed. See here goo.gl/Wte1I2. 
 
 This app is Heroku ready, scheduled to update every 10 minutes. You will need to specify your Twitter credentials as part of your Heroku environment. 
 
